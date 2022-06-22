@@ -1,2 +1,18 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script context="module" lang="ts">
+	export async function load({ fetch }) {
+		const response = await fetch('api/box/client');
+		const client = await response.json();
+
+		return {
+			props: {
+				client
+			}
+		};
+	}
+</script>
+
+<script lang="ts">
+	export let client: any;
+</script>
+
+User: <pre>{JSON.stringify(client, null, 2)}</pre>
