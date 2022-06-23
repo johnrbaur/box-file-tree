@@ -1,20 +1,13 @@
-<script context="module" lang="ts">
-	export async function load({ fetch }) {
-		const response = await fetch('api/box/files');
-		const files = await response.json();
-
-		return {
-			props: {
-				files
-			}
-		};
-	}
-</script>
-
 <script lang="ts">
-	import type { FolderTree } from './api/box/files';
-
-	export let files: FolderTree;
+	const files: Promise<string> = fetch('api/box/files')
+		.then((res) => res.json())
+		.then((json) => JSON.stringify(json, null, 2));
 </script>
 
-<pre>{JSON.stringify(files, null, 2)}</pre>
+{#await files}
+	<p>Waiting...</p>
+{:then fileTree}
+	<pre>{fileTree}</pre>
+{:catch error}
+	<p style="color: red">{error.message}</p>
+{/await}

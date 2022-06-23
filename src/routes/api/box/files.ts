@@ -4,6 +4,7 @@ import type { Folder } from '$lib/types';
 export async function get(): Promise<{ body: any}> {
   const info: Folder = await client.folders.get('0');
   const body = await folderToFolderTree(info);
+  console.log({body})
   return { body };
 }
 
@@ -29,6 +30,5 @@ async function folderToFolderTree(folder: Folder):Promise<FolderTree> {
     }
   }
 
-  console.log(result)
   return result;
 }
