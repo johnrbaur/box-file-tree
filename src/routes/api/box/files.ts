@@ -1,34 +1,43 @@
 import { client } from '$lib/box';
 import type { Folder } from '$lib/types';
+import type { FolderMini, FileMini } from 'box-node-sdk/lib/schemas';
 
-export async function get(): Promise<{ body: any}> {
-  const info: Folder = await client.folders.get('0');
-  const body = await folderToFolderTree(info);
-  console.log({body})
-  return { body };
+export async function get(): Promise<{ body: any }> {
+	const info: Folder = await client.folders.get('0');
+	const body = await folderToFolderTree(info);
+	console.log({ body });
+	return { body };
 }
 
 export interface FolderTree {
-  name: string;
-  folders: FolderTree[];
-  files: string[];
+	name: string;
+	folders?: FolderTree[];
+	files?: string[];
 }
 
-async function folderToFolderTree(folder: Folder):Promise<FolderTree> {
-  const result: FolderTree = {
-    name: folder.name ?? '',
-    folders: [],
-    files: [],
-  };
+async function folderToFolderTree(folder: Folder): Promise<FolderTree> {
+	const result: FolderTree = {
+		name: folder.name ?? ''
+	};
 
-  for (const entry of folder.item_collection?.entries ?? []) {
-    if (entry.type === 'folder') {
-      const subFolder = await client.folders.get(entry.id);
-      result.folders.push(await folderToFolderTree(subFolder));
-    } else if (entry.type === 'file' && entry.name) {
-      result.files.push(entry.name);
-    }
-  }
+	await Promise.all(
+		folder.item_collection?.entries?.map(async (entry: FolderMini | FileMini) => {
+			if (entry.type === 'folder') {
+        if (!result.folders) {
+          result.folders = [];
+        }
+				const subFolder = await client.folders
+					.get(entry.id)
+					.then((f: Folder) => folderToFolderTree(f));
+				result.folders.push(subFolder);
+			} else if (entry.type === 'file' && entry.name) {
+        if (!result.files) {
+          result.files = [];
+        }
+				result.files.push(entry.name);
+			}
+		})
+	);
 
-  return result;
+	return result;
 }
