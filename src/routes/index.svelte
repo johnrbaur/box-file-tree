@@ -1,18 +1,18 @@
 <script context="module" lang="ts">
 	export async function load({ fetch }) {
-		const response = await fetch('api/box/client');
-		const client = await response.json();
+		const response = await fetch('api/box/user');
+		const user = await response.json();
 
 		return {
 			props: {
-				client
+				user
 			}
 		};
 	}
 </script>
 
 <script lang="ts">
-	export let client: any;
+	export let user: any;
 </script>
 
-User: <pre>{JSON.stringify(client, null, 2)}</pre>
+User: <pre>{JSON.stringify(user, null, 2)}</pre>

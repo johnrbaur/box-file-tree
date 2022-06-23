@@ -6,8 +6,4 @@ const sdk = new BoxSDK({
   clientSecret: secrets.box.clientSecret
 });
 
-const client = sdk.getBasicClient(secrets.box.devToken);
-
-export async function get(): Promise<{ body: any}> {
-  return { body: await client.users.get(client.CURRENT_USER_ID) };
-}
+export const client = sdk.getBasicClient(secrets.box.devToken);
