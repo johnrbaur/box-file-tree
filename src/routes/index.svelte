@@ -1,18 +1,20 @@
 <script context="module" lang="ts">
 	export async function load({ fetch }) {
-		const response = await fetch('api/box/user');
-		const user = await response.json();
+		const response = await fetch('api/box/files');
+		const files = await response.json();
 
 		return {
 			props: {
-				user
+				files
 			}
 		};
 	}
 </script>
 
 <script lang="ts">
-	export let user: any;
+	import type { FolderTree } from './api/box/files';
+
+	export let files: FolderTree;
 </script>
 
-User: <pre>{JSON.stringify(user, null, 2)}</pre>
+<pre>{JSON.stringify(files, null, 2)}</pre>
