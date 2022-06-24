@@ -1,6 +1,5 @@
 import { client } from '$lib/box';
 import type { Folder } from '$lib/types';
-import type { FolderMini, FileMini } from 'box-node-sdk/lib/schemas';
 
 export async function get(): Promise<{ body: any }> {
 	const info: Folder = await client.folders.get('0');
@@ -20,20 +19,25 @@ async function folderToFolderTree(folder: Folder): Promise<FolderTree> {
 		name: folder.name ?? ''
 	};
 
+	const entries = folder.item_collection?.entries;
+	if (!entries) {
+		return result;
+	}
+
 	await Promise.all(
-		folder.item_collection?.entries?.map(async (entry: FolderMini | FileMini) => {
+		entries.map(async (entry) => {
 			if (entry.type === 'folder') {
-        if (!result.folders) {
-          result.folders = [];
-        }
+				if (!result.folders) {
+					result.folders = [];
+				}
 				const subFolder = await client.folders
 					.get(entry.id)
 					.then((f: Folder) => folderToFolderTree(f));
 				result.folders.push(subFolder);
 			} else if (entry.type === 'file' && entry.name) {
-        if (!result.files) {
-          result.files = [];
-        }
+				if (!result.files) {
+					result.files = [];
+				}
 				result.files.push(entry.name);
 			}
 		})
